@@ -15,7 +15,11 @@ def create_app(config_name):
 
     db.init_app(app)
 
+    app.jinja_env.add_extension('pyjade.ext.jinja.PyJadeExtension')
+
+    from .main import main as main_blueprint
     from .api import api as api_blueprint
+    app.register_blueprint(main_blueprint)
     app.register_blueprint(api_blueprint)
 
     api_rest = Api(app, prefix='/api')
@@ -23,14 +27,5 @@ def create_app(config_name):
     # adicionar rotas
     from .api import routes
     routes.route_all_resources(api_rest)
-
-    @app.route('/')
-    def index():
-        return "It's working"
-
-    @app.route('/hello/<name>')
-    @app.route('/hello')
-    def hello(name=None):
-        return "Hello {}, I'm Flask".format(name)
 
     return app
